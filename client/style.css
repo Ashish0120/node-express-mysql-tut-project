@@ -14,6 +14,7 @@ table, th, td {
 }
 
 th, td {
-    padding:  5px;;
-    margin:   2px;
+    padding:  5px;
+    margin:  2px;
+    border: 1px solid #000;
 }
