@@ -17,10 +17,10 @@ function loadHTMLTable(data){
     data.forEach(({id,name,date},index) => {
         tableHtml += "<tr class='item'>";
         tableHtml += `<td class="key">${index+1}</td>`;
-        tableHtml += `<td>${name}</td>`;
+        tableHtml += `<td><span class="item-text">${name}</span><input class="edit-input hide" type="text" value="${name}"></td>`;
         tableHtml += `<td>${new Date(date).toLocaleString()}</td>`;
         tableHtml += `<td><button class="delete-row-btn" data-id="${id}" >Delete</button></td>`;
-        tableHtml += `<td><button class="edit-row-btn" data-id="${id}" >Edit</button></td>`;
+        tableHtml += `<td class="edit-btn-td"><button class="edit-row-btn" data-id="${id}">Edit</button><button class="js-cancel hide">Cancel</button></td>`;
         tableHtml += "</tr>";
     });
 
@@ -67,11 +67,11 @@ function insertRowIntoTable(data) {
         const index = document.querySelectorAll('table tbody tr.item').length;
         const {id,name,date} = data;
 
-        tableHtml += `<td>${index + 1 }</td>`;
-        tableHtml += `<td>${name}</td>`;
+        tableHtml += `<td>${index+1}</td>`;
+        tableHtml += `<td><span class="item-text">${name}</span><input class="edit-input hide" type="text" value="${name}"></td>`;
         tableHtml += `<td>${new Date(date).toLocaleString()}</td>`;
         tableHtml += `<td><button class="delete-row-btn" data-id="${id}">Delete</button></td>`;
-        tableHtml += `<td><button class="edit-row-btn" data-id="${id}">Edit</button></td>`;
+        tableHtml += `<td class="edit-btn-td"><button class="edit-row-btn" data-id="${id}">Edit</button><button class="js-cancel hide">Cancel</button></td>`;
     
         if(hasTableData){
             table.innerHTML = innerHTML;
@@ -86,7 +86,7 @@ document.querySelector('table tbody').addEventListener('click', function(event) 
     if(event.target.className === "delete-row-btn"){
         const response = deleteRowById(event.target.dataset.id);
         // console.log('==============', response);
-        response.then(data => console.log('my data', data))
+        // response.then(data => console.log('my data', data))
         response.then(data => {
             // console.log('data', data);
             if(data.success){
@@ -100,6 +100,37 @@ document.querySelector('table tbody').addEventListener('click', function(event) 
                 rowItem.remove();
             }
         });
+    } else if((event.target.classList.contains("edit-row-btn") && !event.target.classList.contains("js-save"))){
+        const rowItem = event.target.closest('.item');
+        let openEdit = (rowItem.closest('#table-body')).querySelector(".edit-row-btn.save");
+        // console.log('openEdit',openEdit);
+        if(openEdit){
+            (openEdit.closest('td')).querySelector('.js-cancel').click();
+        }
+        let show = toggleEditSave(event.target);
+        toggleEditInput(rowItem, show);
+    } else if(event.target.classList.contains('js-cancel')) {
+        const rowItem = event.target.closest('.item');
+        let show = toggleEditSave(rowItem.querySelector('.edit-row-btn'));
+        // const rowItem = event.target.closest('.item');
+        toggleEditInput(rowItem, show);
+    } else if (event.target.contains('js-save')){
+        const response = editRowById(event.target.dataset.id);
+        // console.log('==============', response);
+        // response.then(data => console.log('my data', data))
+        response.then(data => {
+            // console.log('data', data);
+            if(data.success){
+                const rowItem = event.target.closest('.item');
+                // let next = rowItem.nextElementSibling;
+                // while (next){
+                //     let element = next.querySelector('.key');
+                //     element.innerHTML = parseInt(element.innerHTML,10) - 1;
+                //     next = next.nextElementSibling;
+                // }
+                // rowItem.remove();
+            }
+        });
     }
 });
 
@@ -111,4 +142,51 @@ async function deleteRowById(id){
     .then(data => {return data;});
 
     // return response;
+}
+
+async function editRowById(id){
+    return await fetch('http://localhost:5000/delete/' + id, {
+        method:'PUT'
+    })
+    .then(response => response.json())
+    .then(data => {return data;});
+
+    // return response;
+}
+
+function toggleEditInput(tr, show){
+    if(show){
+        tr.querySelector('.item-text').classList.add('hide');
+        tr.querySelector('.edit-input').classList.remove('hide');
+    } else {
+        tr.querySelector('.item-text').classList.remove('hide');
+        tr.querySelector('.edit-input').classList.add('hide');
+    }
+    toggleEditCancel(tr, show);
+}
+
+function toggleEditCancel(tr, show){
+    // console.log(tr);
+    // console.log(tr.querySelector('.js-cancel'));
+    if(show){
+        tr.querySelector('.js-cancel').classList.remove('hide');
+    } else {
+        tr.querySelector('.js-cancel').classList.add('hide');
+    }
+}
+
+function clearEditInput(tr){
+    tr.querySelector('.edit-input').value = "";
+}
+
+function toggleEditSave(element){
+    if(element.classList.contains('save')){
+        element.classList.remove('save');
+        element.innerHTML = 'Edit';
+        return false;
+    } else {
+        element.classList.add('save');
+        element.innerHTML = 'Save';
+        return true;
+    }
 }

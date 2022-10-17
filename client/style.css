@@ -13,8 +13,21 @@ table, th, td {
     border: 1px solid #000;
 }
 
+.edit-btn-td {
+    white-space: nowrap; 
+}
+
+.edit-btn-td > button {
+    margin: 0px 5px;
+    padding: 0px 5px;
+}
+
 th, td {
     padding:  5px;
     margin:  2px;
     border: 1px solid #000;
+}
+
+.hide {
+    display: none;
 }
