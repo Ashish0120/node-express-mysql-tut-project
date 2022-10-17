@@ -16,7 +16,7 @@ app.post('/insert',(request,response) => {
     // response.json({data: request.body});
     // return null;
     // const {name} = request.body;
-    // console.log('Name :' , name);
+    // console.log('Name :' , name);//
     const name = request.body?.name ?? null ;
     if(!name) response.json({success: false});
 
