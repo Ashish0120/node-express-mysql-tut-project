@@ -40,6 +40,25 @@ class DbService {
         }
     }
 
+    async getDataByName(name) {
+        try {
+            const response = await new Promise((resolve, reject) => {
+                const query = "SELECT * FROM names WHERE name LIKE ?;";
+                connection.query(query, ['%' + name + '%'] ,(err, results) => {
+                    // console.log('err',err);
+                    if(err) reject(new Error(err.message));
+                    resolve(results);
+                })
+                // console.log(connection.sql);
+            });
+            console.log('resp: ',response.sql);
+            
+            return response;
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     async insertNewName(name){
         try {
             if(!name || name.length == 0 ) return false;
@@ -79,6 +98,28 @@ class DbService {
             console.log(error.message);
         }
         return false;
+    }
+
+    async updateNameById(id, name) {
+        try{ 
+            if(!id || !name || id.length == 0 || name.length == 0) return false;
+            const response = await new Promise((resolve,reject) => {
+                const query = "UPDATE names SET name = ? where id = ?";
+                connection.query(query, [name,id], (err, result) => {
+                    // console.log('rrr', result);
+                    if(err) reject(new Error(err.message));
+                    resolve(result.changedRows);
+                });
+            });
+
+            return {
+                success: true,
+                id: response,
+                name:name
+            };
+        } catch (error){
+            console,log(error.message);
+        }
     }
 }
 

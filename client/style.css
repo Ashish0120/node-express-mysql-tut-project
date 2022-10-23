@@ -1,11 +1,12 @@
 main {
-    width: 50%;
+    width: auto;
     margin: auto;
     text-align: center;
 }
 
 table {
     margin: 50px auto;
+    min-width: 720px;
 }
 
 table, th, td {

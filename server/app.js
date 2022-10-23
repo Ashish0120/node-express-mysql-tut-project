@@ -40,6 +40,19 @@ app.get('/getAll',(request,response) => {
     .catch(err => console.error(err));
 });
 
+// get by name
+app.get('/get/:name',(request,response) => {
+   
+    console.log('======',request.params.name);
+    const name = request.params?.name ?? null;
+    const db = dbService.getDbServiceInstance();
+    const result = db.getDataByName(name);
+
+    result.then(data =>{ 
+         response.json({data:data})})
+    .catch(err => console.error(err));
+});
+
 // delete
 app.delete('/delete/:id',(request,response) => {
     // console.log(request.body);
@@ -56,6 +69,34 @@ app.delete('/delete/:id',(request,response) => {
     result.then(data => response.json({success:data}))
     .catch(err => console.log(err));
     
+});
+
+// update
+app.patch('/update',(request,response) => {
+    // console.log(request.body);
+    // response.json({data: request.body});
+    // return null;
+    // const {name} = request.body;
+    // console.log('Name :' , name);
+    const id = request.body?.id ?? null ;
+    const name = request.body?.name ?? null ;
+    if(!id || !name) {
+        response.json({success: "false0"});
+        return ;
+    }
+
+    const db = dbService.getDbServiceInstance();
+    const result = db.updateNameById(id,name);
+
+    result.then(data => {
+        // const resp = data;
+        // if(data.success){
+        //     resp.success = false;
+        // }
+        response.json(data);
+    })
+    .catch(err => console.log(err)); 
+
 });
 
 app.listen(process.env.PORT, () => console.log('app is running'));
